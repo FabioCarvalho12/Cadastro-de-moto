@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Produtos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .btn {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+        .btn-edit {
+            background-color: #2196F3;
+        }
+        .btn-delete {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cadastro de Produtos</h1>
+    <form id="formulario-produto">
+        <input type="text" id="tipo" placeholder="Tipo" required>
+        <input type="text" id="marca" placeholder="Marca" required>
+        <input type="text" id="modelo" placeholder="Modelo" required>
+        <input type="number" id="valor" placeholder="Valor em R$" step="0.01" required>
+        <input type="number" id="quantidade" placeholder="Quantidade" required>
+        <button type="submit" class="btn">Cadastrar</button>
+    </form>
+
+    <h2>Produtos Cadastrados</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Valor (R$)</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="lista-produtos">
+        </tbody>
+    </table>
+
+    <script>
+        const formularioProduto = document.getElementById('formulario-produto');
+        const listaProdutos = document.getElementById('lista-produtos');
+        const produtos = [];
+
+        formularioProduto.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const tipo = document.getElementById('tipo').value;
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const valor = parseFloat(document.getElementById('valor').value);
+            const quantidade = parseInt(document.getElementById('quantidade').value);
+
+            if (!tipo || !marca || !modelo || isNaN(valor) || isNaN(quantidade)) {
+                alert('Preencha todos os campos corretamente.');
+                return;
+            }
+
+            const produto = {
+                tipo,
+                marca,
+                modelo,
+                valor,
+                quantidade,
+            };
+
+            produtos.push(produto);
+            adicionarProduto(produto);
+            limparFormulario();
+        });
+
+        function adicionarProduto(produto) {
+            const linha = listaProdutos.insertRow();
+            const celulaTipo = linha.insertCell(0);
+            const celulaMarca = linha.insertCell(1);
+            const celulaModelo = linha.insertCell(2);
+            const celulaValor = linha.insertCell(3);
+            const celulaQuantidade = linha.insertCell(4);
+            const celulaAcoes = linha.insertCell(5);
+
+            celulaTipo.textContent = produto.tipo;
+            celulaMarca.textContent = produto.marca;
+            celulaModelo.textContent = produto.modelo;
+            celulaValor.textContent = produto.valor.toFixed(2);
+            celulaQuantidade.textContent = produto.quantidade;
+
+            const botaoEditar = document.createElement('button');
+            botaoEditar.textContent = 'Editar';
+            botaoEditar.classList.add('btn', 'btn-edit');
+            botaoEditar.addEventListener('click', function () {
+                editarProduto(produto, linha);
+            });
+
+            const botaoExcluir = document.createElement('button');
+            botaoExcluir.textContent = 'Excluir';
+            botaoExcluir.classList.add('btn', 'btn-delete');
+            botaoExcluir.addEventListener('click', function () {
+                excluirProduto(linha, produto);
+            });
+
+            celulaAcoes.appendChild(botaoEditar);
+            celulaAcoes.appendChild(botaoExcluir);
+        }
+
+        function limparFormulario() {
+            formularioProduto.reset();
+        }
+
+        function editarProduto(produto, linha) {
+            const index = produtos.indexOf(produto);
+            if (index !== -1) {
+                const novoTipo = prompt('Novo tipo:', produto.tipo);
+                const novaMarca = prompt('Nova marca:', produto.marca);
+                const novoModelo = prompt('Novo modelo:', produto.modelo);
+                const novoValor = parseFloat(prompt('Novo valor em R$:', produto.valor));
+                const novaQuantidade = parseInt(prompt('Nova quantidade:', produto.quantidade));
+
+                if (!novoTipo || !novaMarca || !novoModelo || isNaN(novoValor) || isNaN(novaQuantidade)) {
+                    alert('Preencha todos os campos corretamente.');
+                    return;
+                }
+
+                const novoProduto = {
+                    tipo: novoTipo,
+                    marca: novaMarca,
+                    modelo: novoModelo,
+                    valor: novoValor,
+                    quantidade: novaQuantidade,
+                };
+
+                produtos[index] = novoProduto;
+                atualizarLinha(linha, novoProduto);
+            }
+        }
+
+        function excluirProduto(linha, produto) {
+            const index = produtos.indexOf(produto);
+            if (index !== -1) {
+                produtos.splice(index, 1);
+                linha.remove();
+            }
+        }
+
+        function atualizarLinha(linha, produto) {
+            linha.cells[0].textContent = produto.tipo;
+            linha.cells[1].textContent = produto.marca;
+            linha.cells[2].textContent = produto.modelo;
+            linha.cells[3].textContent = produto.valor.toFixed(2);
+            linha.cells[4].textContent = produto.quantidade;
+        }
+    </script>
+</body>
+</html>
